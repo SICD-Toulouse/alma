@@ -1,0 +1,6 @@
+rule "Fusion Alma"
+  when
+	 merge
+  then
+	add MARC."998"
+end
