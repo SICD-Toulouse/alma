@@ -1,0 +1,226 @@
+rule "PasserelleSUDOC"
+when
+ (TRUE)
+then
+
+
+  # Mettre le PPN en 035
+  addControlField "009.PPN"
+  addSystemNumber "035.a" from "001" prefixed by "009"
+  prefix "035.a" with "(PPN)" if (exists "035.9.sudoc")
+
+
+  # Faire les liens entre notices (sauf 41X, 454, 46X)
+  changeSubField "42*.0" to "1"
+  changeSubField "43*.0" to "1"
+  changeSubField "44*.0" to "1"
+  changeSubField "45*.0" to "1"
+  changeSubField "48*.0" to "1"
+  prefix "4**.0" with "(PPN)"
+  prefix "4**.1" with "001(PPN)"
+  removeSubfield "454.1"
+  removeControlField "009"
+  removeField "PPN"
+ 
+
+  # Supprime des 035 sans intérêt
+  removeField "035" if (exists "035.a.PRITEC*")
+  removeField "035" if (exists "035.a.DYNIX*")
+  removeField "035" if (exists "035.a.sib*")
+  removeField "035" if (exists "035.a.uba*")
+  removeField "035" if (exists "035.a.ubs*")
+  removeField "035" if (exists "035.a.urouen*")
+  removeField "035" if (exists "035.a.sta*")
+  removeField "035" if (exists "035.a.ocm*")
+  removeField "035" if (exists "035.a.ICP*")
+  removeField "035" if (exists "035.a.Evry*")
+  removeField "035" if (exists "035.a.Hz*")
+
+  
+  #Génère les délimiteurs de tri << >>
+  replaceContents "2**.*.\u0098" with "<<"
+  replaceContents "2**.*.\u009c" with ">>"
+  replaceContents "4**.*.\u0098" with "<<"
+  replaceContents "4**.*.\u009c" with ">>"
+  replaceContents "5**.*.\u0098" with "<<"
+  replaceContents "5**.*.\u009c" with ">>"
+  replaceContents "6**.*.\u0098" with "<<"
+  replaceContents "6**.*.\u009c" with ">>"
+  replaceContents "7**.*.\u0098" with "<<"
+  replaceContents "7**.*.\u009c" with ">>"
+
+
+ #Titre parallèle : supprime de 2e signe =
+  replaceContents "200.d.= " with ""
+
+
+ # Index Note de thèse
+  removeField "928" 
+  copyField "328" to "928"
+
+
+  # Index NNT
+  removeField "929" 
+  copyField "029" to "929"
+
+
+  # Indexation locale livre ancien pour moissonnage par Tolosana
+  changeField "606" to "610" if (exists "606.2.tol")
+
+
+# Index Langue originale Oui/Non/Bilingue
+removeField "901"
+copyField "101" to "901"
+removeSubField "901.*"
+addSubField "901.a.Oui" if (exists "901.{0,-}")
+addSubField "901.a.Non" if (exists "901.{1,-}")
+addSubField "901.a.Bilingue" if (exists "901.{2,-}")
+
+
+# Index Langue du texte
+removeField "902"
+copyField "101" to "902"
+removeSubField "902.b"
+removeSubField "902.c"
+removeSubField "902.d"
+removeSubField "902.e"
+removeSubField "902.f"
+removeSubField "902.g"
+removeSubField "902.h"
+removeSubField "902.i"
+removeSubField "902.j"
+
+replaceContents "902.a.ara" with "arabe"
+replaceContents "902.a.arg" with "aragonais"
+replaceContents "902.a.ast" with "asturien; bable ; léonais ; asturoléonais"
+replaceContents "902.a.baq" with "basque"
+replaceContents "902.a.cat" with "catalan ; valencien"
+replaceContents "902.a.chi" with "chinois"
+replaceContents "902.a.eng" with "anglais"
+replaceContents "902.a.fre" with "français"
+replaceContents "902.a.ger" with "allemand"
+replaceContents "902.a.glg" with "galicien"
+replaceContents "902.a.grc" with "grec ancien (jusqu'à 1453)"
+replaceContents "902.a.gre" with "grec moderne (après 1453)"
+replaceContents "902.a.heb" with "hébreu"
+replaceContents "902.a.ita" with "italien"
+replaceContents "902.a.jpn" with "japonais"
+replaceContents "902.a.lat" with "latin"
+replaceContents "902.a.oci" with "occitan"
+replaceContents "902.a.por" with "portugais"
+replaceContents "902.a.rus" with "russe"
+replaceContents "902.a.sgn" with "langues des signes"
+replaceContents "902.a.spa" with "espagnol ; castillan"
+
+# Supprimer des champs ou sous-champs sans intérêt
+  removeField "345"
+  removeField "615"
+  removeField "626"
+  removeField "66*"
+  removeField "686" if (exists "686.2.local_cujas")
+  removeField "801" if (exists "801.b.UBS")
+  removeField "801" if (exists "801.b.OCLC")
+  removeField "801" if (exists "801.b.BN")
+  removeField "801" if (exists "801.b.SF")
+  removeField "801" if (exists "801.b.Electre")
+  removeField "801" if (exists "801.b.AUROC")
+  removeField "915"
+  removeField "990"
+  removeField "992"
+  removeField "999"
+
+# Supprimer le code de fonction 555 pour les directeurs de thèse
+changeSubFieldExceptFirst "702.4" to "9" if (exists "702.4.555")
+removeSubfield "702.9"
+
+
+# Affiche le PPN actif en premier
+changeSubField "035.a" to "z" if (exists "035.9.sudoc")
+changeField "035" to "999" if (not exists "035.a.(PPN)*")
+changeField "999" to "035" if (not exists "035.a.(PPN)*")
+
+
+# Ajouter le champ 993 (afficher l'état de collection des périodiques dans la notice bib)
+replaceContentsOnlyFirst "955.5.315552325:.*" with "INP-ENSIACET"
+replaceContentsOnlyFirst "955.5.810042101:.*" with "BU Albi"
+replaceContentsOnlyFirst "955.5.315552103:.*" with "Bibliothèque de l'Arsenal"
+replaceContentsOnlyFirst "955.5.315552290:.*" with "Bibliothèque d'études méridionales"
+replaceContentsOnlyFirst "955.5.315552247:.*" with "Bibliothèque de mathématiques et mécanique"
+replaceContentsOnlyFirst "955.5.315552110:.*" with "Bibliothèque François de Boutaric"
+replaceContentsOnlyFirst "955.5.315552102:.*" with "BUC Mirail"
+replaceContentsOnlyFirst "955.5.810652101:.*" with "BU Castres - ISIS"
+replaceContentsOnlyFirst "955.5.315552250:.*" with "Centre Documentation Recherche Sciences Humaines et Sociales - UPS"
+replaceContentsOnlyFirst "955.5.315552218:.*" with "Centre Lettres Arts Philosophie"
+replaceContentsOnlyFirst "955.5.315552271:.*" with "Centre Régional de Documentation en Santé Publique - UPS"
+replaceContentsOnlyFirst "955.5.315552210:.*" with "Centre de ressources des langues Mirail"
+replaceContentsOnlyFirst "955.5.315552248:.*" with "Centre de ressources Olympe de Gouges"
+replaceContentsOnlyFirst "955.5.315552220:.*" with "CR de psychologie Louise Michel"
+replaceContentsOnlyFirst "955.5.315552298:.*" with "Centres de Recherche UT1"
+replaceContentsOnlyFirst "955.5.315552319:.*" with "Bibliothèque ENAC"
+replaceContentsOnlyFirst "955.5.654402301:.*" with "INP-ENIT"
+replaceContentsOnlyFirst "955.5.315552324:.*" with "INP-ENSAT"
+replaceContentsOnlyFirst "955.5.315552301:.*" with "ENVT"
+replaceContentsOnlyFirst "955.5.315552207:.*" with "Médiathèque ENSAV"
+replaceContentsOnlyFirst "955.5.810042302:.*" with "ESPE Albi"
+replaceContentsOnlyFirst "955.5.320132201:.*" with "Bibliothèque Auch"
+replaceContentsOnlyFirst "955.5.320132301:.*" with "Bibliothèque Auch"
+replaceContentsOnlyFirst "955.5.460422301:.*" with "ESPE Cahors"
+replaceContentsOnlyFirst "955.5.315552358:.*" with "ESPE Toulouse Croix-de-Pierre"
+replaceContentsOnlyFirst "955.5.821212301:.*" with "ESPE Montauban"
+replaceContentsOnlyFirst "955.5.315552354:.*" with "ESPE Toulouse Rangueil"
+replaceContentsOnlyFirst "955.5.122022301:.*" with "ESPE Rodez"
+replaceContentsOnlyFirst "955.5.315552355:.*" with "ESPE Toulouse St-Agne"
+replaceContentsOnlyFirst "955.5.654402302:.*" with "ESPE Tarbes"
+replaceContentsOnlyFirst "955.5.461022201:.*" with "IUT Figeac"
+replaceContentsOnlyFirst "955.5.091222201:.*" with "Centre de ressources FOIX"
+replaceContentsOnlyFirst "955.5.315552253:.*" with "Bibliothèque Garrigou"
+replaceContentsOnlyFirst "955.5.315552213:.*" with "Bibliothèque Sciences Po"
+replaceContentsOnlyFirst "955.5.315552106:.*" with "BIB'INSA"
+replaceContentsOnlyFirst "955.5.315552318:.*" with "Bibliothèque ISAE-SUPAERO"
+replaceContentsOnlyFirst "955.5.122022201:.*" with "IUT Rodez"
+replaceContentsOnlyFirst "955.5.310692201:.*" with "IUT Blagnac"
+replaceContentsOnlyFirst "955.5.810652201:.*" with "CRDOC IUT Castres"
+replaceContentsOnlyFirst "955.5.315552289:.*" with "IUT Ponsan"
+replaceContentsOnlyFirst "955.5.315552348:.*" with "IUT Rangueil"
+replaceContentsOnlyFirst "955.5.654402201:.*" with "IUT Tarbes"
+replaceContentsOnlyFirst "955.5.315552109:.*" with "BU Santé Allées"
+replaceContentsOnlyFirst "955.5.315552107:.*" with "Bibliothèque de la Manufacture"
+replaceContentsOnlyFirst "955.5.810042301:.*" with "IMT Mines Albi"
+replaceContentsOnlyFirst "955.5.821212102:.*" with "Médiathèque Montauriol"
+replaceContentsOnlyFirst "955.5.821212101:.*" with "Médiathèque Montauriol"
+replaceContentsOnlyFirst "955.5.315552331:.*" with "INP-ENSEEIHT"
+replaceContentsOnlyFirst "955.5.315552299:.*" with "Observatoire Midi-Pyrénées"
+replaceContentsOnlyFirst "955.5.122022101:.*" with "BU Rodez"
+replaceContentsOnlyFirst "955.5.315552105:.*" with "BU Santé Rangueil"
+replaceContentsOnlyFirst "955.5.315552104:.*" with "BU Sciences"
+replaceContentsOnlyFirst "955.5.315552108:.*" with "SICD (BU Arsenal)"
+replaceContentsOnlyFirst "955.5.315552282:.*" with "Centre de documentation GEODE"
+replaceContentsOnlyFirst "955.5.315552233:.*" with "Centre de documentation Octogone-Lordat"
+replaceContentsOnlyFirst "955.5.315552231:.*" with "Centre de documentation LISST-Dynamiques rurales"
+replaceContentsOnlyFirst "955.5.315552230:.*" with "Centre de documentation CLLE-LTC"
+replaceContentsOnlyFirst "955.5.315552201:.*" with "Centre de doc. Cultures anglo-saxonnes"
+replaceContentsOnlyFirst "955.5.315552214:.*" with "Centre de documentation EFTS"
+replaceContentsOnlyFirst "955.5.315552246:.*" with "Centre de documentation Genre-Sagesse"
+replaceContentsOnlyFirst "955.5.315552245:.*" with "Centre de documentation CERTOP"
+replaceContentsOnlyFirst "955.5.315552244:.*" with "Centre de documentation CLLE-ERSS"
+replaceContentsOnlyFirst "955.5.315552269:.*" with "Centre de documentation PDPS"
+replaceContentsOnlyFirst "955.5.315552270:.*" with "Centre de documentation Jean Monnet"
+replaceContentsOnlyFirst "955.5.315552243:.*" with "Centre de documentation LISST-CAS"
+replaceContentsOnlyFirst "955.5.315552219:.*" with "Centre de documentation ERASME"
+replaceContentsOnlyFirst "955.5.315552217:.*" with "Centre de documentation CRATA"
+replaceContentsOnlyFirst "955.5.315552287:.*" with "Centre de doc. Études germaniques"
+replaceContentsOnlyFirst "955.5.315552291:.*" with "Centre de documentation sur l'Amérique latine"
+replaceContentsOnlyFirst "955.5.315552259:.*" with "Centre Toulousain d'Histoire du droit et des idées politiques"
+replaceContentsOnlyFirst "955.5.315552203:.*" with "Centre de documentation LISST-CIEU"
+replaceContentsOnlyFirst "955.5.315555204:.*" with "IEJUC"
+
+copyField "955" to "993.{ , }" if(exists "955.r")
+removeSubField "993.a"
+removeSubField "993.b"
+removeSubField "993.j"
+removeSubField "993.i"
+changeSubField "993.5" to "a"
+prefix "993.r" with "État de collection : "
+changeSubField "993.r" to "c" 
+
+end
