@@ -1,0 +1,8 @@
+rule "remove data field 31*, 856 and 9*"
+    when
+        (TRUE)
+    then
+        removeField "31*"
+        removeField "856"
+        removeField "9*"
+end
