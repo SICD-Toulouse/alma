@@ -1,0 +1,6 @@
+rule "Fusion Import Electre"
+  when
+	 merge
+  then
+	replace MARC.XXX excluding "035,1XX,2XX,330,333,345,6XX,7XX,801,830,902,903,947,969"
+end
