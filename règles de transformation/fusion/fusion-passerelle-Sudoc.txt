@@ -1,0 +1,6 @@
+rule "Fusion Passerelle SUDOC"
+  when
+	 merge
+  then
+	replace MARC.XXX excluding "998"
+end
