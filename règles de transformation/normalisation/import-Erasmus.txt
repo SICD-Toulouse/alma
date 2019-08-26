@@ -1,0 +1,7 @@
+rule "Import Erasmus"
+    when
+        (TRUE)
+    then
+replaceContents "960.s.EUR " with ""
+
+end
