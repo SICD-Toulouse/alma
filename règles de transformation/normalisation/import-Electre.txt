@@ -1,0 +1,19 @@
+rule "Import Electre"
+    when
+        (TRUE)
+    then
+
+removeField "211"
+removeField "330"
+removeField "345"
+removeField "686"
+removeField "801"
+removeField "830"       
+removeField "856"
+removeField "902"
+removeField "903"
+
+replaceContents "2**.*.\u0088" with "<<"
+replaceContents "2**.*.\u0089" with ">>"
+
+end
