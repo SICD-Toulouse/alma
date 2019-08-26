@@ -1,0 +1,31 @@
+rule "remove data field 31*, 856 and 9*"
+    when
+        (TRUE)
+    then
+
+ addControlField "009.PPN"
+  addSystemNumber "035.a" from "001" prefixed by "009"
+  prefix "035.a" with "(PPN)" if (exists "035.9.sudoc")
+ 
+  removeControlField "009"
+ 
+ removeField "035"  if (not exists "035.a.(PPN)*")
+
+ replaceContents "2**.*.\u0098" with "<<"
+  replaceContents "2**.*.\u009c" with ">>"
+  replaceContents "4**.*.\u0098" with "<<"
+  replaceContents "4**.*.\u009c" with ">>"
+  replaceContents "5**.*.\u0098" with "<<"
+  replaceContents "5**.*.\u009c" with ">>"
+  replaceContents "6**.*.\u0098" with "<<"
+  replaceContents "6**.*.\u009c" with ">>"
+  replaceContents "7**.*.\u0098" with "<<"
+  replaceContents "7**.*.\u009c" with ">>"
+  replaceContents "200.d.= " with ""
+
+        removeField "31*"
+        removeField "856"
+        removeField "9*"
+
+addField "930.a.NOTICE D'ACQUISITION DERIVEE DU SUDOC"
+end
