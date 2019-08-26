@@ -1,0 +1,51 @@
+rule "Langue originale en 901"
+when
+ (TRUE)
+then
+
+# Index Langue originale Oui/Non/Bilingue
+
+removeField "901"
+copyField "101" to "901"
+removeSubField "901.*"
+addSubField "901.a.Oui" if (exists "901.{0,-}")
+addSubField "901.a.Non" if (exists "901.{1,-}")
+addSubField "901.a.Bilingue" if (exists "901.{2,-}")
+
+# Index Langue du texte
+
+removeField "902"
+copyField "101" to "902"
+removeSubField "902.b"
+removeSubField "902.c"
+removeSubField "902.d"
+removeSubField "902.e"
+removeSubField "902.f"
+removeSubField "902.g"
+removeSubField "902.h"
+removeSubField "902.i"
+removeSubField "902.j"
+
+replaceContents "902.a.ara" with "arabe"
+replaceContents "902.a.arg" with "aragonais"
+replaceContents "902.a.ast" with "asturien; bable ; léonais ; asturoléonais"
+replaceContents "902.a.baq" with "basque"
+replaceContents "902.a.cat" with "catalan ; valencien"
+replaceContents "902.a.chi" with "chinois"
+replaceContents "902.a.eng" with "anglais"
+replaceContents "902.a.fre" with "français"
+replaceContents "902.a.ger" with "allemand"
+replaceContents "902.a.glg" with "galicien"
+replaceContents "902.a.grc" with "grec ancien (jusqu'à 1453)"
+replaceContents "902.a.gre" with "grec moderne (après 1453)"
+replaceContents "902.a.heb" with "hébreu"
+replaceContents "902.a.ita" with "italien"
+replaceContents "902.a.jpn" with "japonais"
+replaceContents "902.a.lat" with "latin"
+replaceContents "902.a.oci" with "occitan"
+replaceContents "902.a.por" with "portugais"
+replaceContents "902.a.rus" with "russe"
+replaceContents "902.a.sgn" with "langues des signes"
+replaceContents "902.a.spa" with "espagnol ; castillan"
+
+end
